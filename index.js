@@ -10,7 +10,7 @@ Controller.prototype = {
     button.addEventListener("click", this.startNewGame.bind(this));
   },
   startNewGame: function() {
-    // this.view.resetBoard(); ??
+    this.view.resetBoard();
     // this.model.resetTileLocations(); ??
     var value = this.model.getTileValue();
     var location = this.model.getTileLocation();
@@ -36,8 +36,9 @@ Model.prototype = {
 }
 
 // View
-function View(buttonElement) {
-  this.startButton = buttonElement;
+function View() {
+  this.startButton = "start";
+  this.tileClass = "tile";
 }
 
 View.prototype = {
@@ -45,13 +46,18 @@ View.prototype = {
     return document.getElementById(this.startButton);
   },
   addTile: function(value, location) {
-    console.log("value: "+value+" location: "+location);
     document.getElementById(location).innerHTML = value;
+  },
+  resetBoard: function() {
+    var tiles = document.getElementsByClassName(this.tileClass);
+    for (var i = 0; i < tiles.length; i++ ) {
+      tiles[i].innerHTML = "";
+    }
   }
 }
 
 window.onload = function() {
-  var view = new View("start");
+  var view = new View();
   var model = new Model();
   var controller = new Controller(view, model);
   controller.addListener();
