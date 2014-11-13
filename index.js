@@ -5,7 +5,11 @@ function Controller(view, model) {
 }
 
 Controller.prototype = {
-  addListener: function() {
+  addListeners: function() {
+    this.addStartListener();
+    this.addKeyListener();
+  },
+  addStartListener: function() {
     var button = this.view.getButton();
     button.addEventListener("click", this.startNewGame.bind(this));
   },
@@ -15,6 +19,9 @@ Controller.prototype = {
     var value = this.model.getTileValue();
     var location = this.model.getTileLocation();
     this.view.addTile(value, location);
+  },
+  addKeyListener: function() {
+    document.addEventListener("keyup", this.view.moveBoard.bind(this));
   }
 }
 
@@ -53,6 +60,11 @@ View.prototype = {
     for (var i = 0; i < tiles.length; i++ ) {
       tiles[i].innerHTML = "";
     }
+  },
+  moveBoard: function(key) {
+    if (key.keyIdentifier === "Up" || key.keyIdentifier === "Down" || key.keyIdentifier === "Left" || key.keyIdentifier === "Right" ) {
+      alert("you pressed "+ key.keyIdentifier)
+    }
   }
 }
 
@@ -60,5 +72,5 @@ window.onload = function() {
   var view = new View();
   var model = new Model();
   var controller = new Controller(view, model);
-  controller.addListener();
+  controller.addListeners();
 }
