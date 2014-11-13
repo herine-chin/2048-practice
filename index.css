@@ -442,7 +442,6 @@ body {
 }
 
 .row {
-  display: block;
   margin: 3px 0;
 }
 
@@ -451,4 +450,6 @@ body {
   width: 5em;
   height: 5em;
   border: 1px solid black;
+  line-height: 5em;
+  vertical-align: top;
 }
