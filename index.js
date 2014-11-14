@@ -15,13 +15,21 @@ Controller.prototype = {
   },
   startNewGame: function() {
     this.view.resetBoard();
-    // this.model.resetTileLocations(); ??
+    this.model.resetTileLocations();
     var value = this.model.getTileValue();
     var location = this.model.getTileLocation();
     this.view.addTile(value, location);
   },
   addKeyListener: function() {
-    document.addEventListener("keyup", this.view.moveBoard.bind(this));
+    document.addEventListener("keyup", this.moveBoard.bind(this));
+  },
+  moveBoard: function(key) {
+    if (key.keyIdentifier === "Up" || key.keyIdentifier === "Down" || key.keyIdentifier === "Left" || key.keyIdentifier === "Right" ) {
+      this.view.shiftTiles(key.keyIdentifier);
+      var value = this.model.getTileValue();
+      var location = this.model.getTileLocation();
+      this.view.addTile(value, location);
+    }
   }
 }
 
@@ -38,7 +46,13 @@ Model.prototype = {
   },
   getTileLocation: function() {
     var tileLocations = this.tileLocations;
-    return tileLocations[Math.floor(Math.random()*tileLocations.length)]
+    return tileLocations.splice(Math.floor(Math.random()*tileLocations.length),1)
+  },
+  resetTileLocations: function() {
+    this.tileLocations = []
+    for (var i = 1; i <= 16; i++) {
+      this.tileLocations.push(i);
+    }
   }
 }
 
@@ -61,10 +75,8 @@ View.prototype = {
       tiles[i].innerHTML = "";
     }
   },
-  moveBoard: function(key) {
-    if (key.keyIdentifier === "Up" || key.keyIdentifier === "Down" || key.keyIdentifier === "Left" || key.keyIdentifier === "Right" ) {
-      alert("you pressed "+ key.keyIdentifier)
-    }
+  shiftTiles: function(direction) {
+
   }
 }
 
