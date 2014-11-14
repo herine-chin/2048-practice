@@ -15,7 +15,7 @@ Controller.prototype = {
   },
   startNewGame: function() {
     this.view.resetBoard();
-    this.model.resetTileLocations();
+    this.model.updateTileLocations();
     var value = this.model.getTileValue();
     var location = this.model.getTileLocation();
     this.view.addTile(value, location);
@@ -48,10 +48,14 @@ Model.prototype = {
     var tileLocations = this.tileLocations;
     return tileLocations.splice(Math.floor(Math.random()*tileLocations.length),1)
   },
-  resetTileLocations: function() {
+  updateTileLocations: function() {
     this.tileLocations = []
-    for (var i = 1; i <= 16; i++) {
-      this.tileLocations.push(i);
+    //way to dry this up? repeated in View
+    var tiles = document.getElementsByClassName("tile");
+    for (var i = 0; i < tiles.length; i++ ) {
+      if (tiles[i].innerHTML === "") {
+        this.tileLocations.push(tiles[i].id);
+      }
     }
   }
 }
