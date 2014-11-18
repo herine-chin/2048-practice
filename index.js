@@ -25,10 +25,28 @@ Controller.prototype = {
   },
   moveBoard: function(key) {
     if (key.keyIdentifier === "Up" || key.keyIdentifier === "Down" || key.keyIdentifier === "Left" || key.keyIdentifier === "Right" ) {
-      this.view.shiftTiles(key.keyIdentifier);
+      this.shiftTiles(key.keyIdentifier);
+
+      this.model.updateTileLocations();
       var value = this.model.getTileValue();
       var location = this.model.getTileLocation();
       this.view.addTile(value, location);
+    }
+  },
+  shiftTiles: function(direction) {
+    switch(direction) {
+      case "Left":
+      this.view.shiftLeft();
+      break;
+      case "Right":
+      this.view.shiftRight();
+      break;
+      case "Up":
+      this.view.shiftUp();
+      break;
+      case "Down":
+      this.view.shiftDown();
+      break;
     }
   }
 }
@@ -53,7 +71,7 @@ Model.prototype = {
     //way to dry this up? repeated in View
     var tiles = document.getElementsByClassName("tile");
     for (var i = 0; i < tiles.length; i++ ) {
-      if (tiles[i].innerHTML === "") {
+      if (tiles[i].textContent === "") {
         this.tileLocations.push(tiles[i].id);
       }
     }
@@ -64,6 +82,8 @@ Model.prototype = {
 function View() {
   this.startButton = "start";
   this.tileClass = "tile";
+  this.rowIds = [[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]];
+  this.columnIds = [[1,5,9,13],[2,6,10,14],[3,7,11,15],[4,8,12,16]];
 }
 
 View.prototype = {
@@ -71,16 +91,58 @@ View.prototype = {
     return document.getElementById(this.startButton);
   },
   addTile: function(value, location) {
-    document.getElementById(location).innerHTML = value;
+    document.getElementById(location).textContent = value;
   },
   resetBoard: function() {
     var tiles = document.getElementsByClassName(this.tileClass);
     for (var i = 0; i < tiles.length; i++ ) {
-      tiles[i].innerHTML = "";
+      tiles[i].textContent = "";
     }
   },
-  shiftTiles: function(direction) {
+  shiftLeft: function() {
+    for (var i = 0; i < 4; i++) {
+      var rowClass = "r" + i;
+      var rowDivs = document.getElementsByClassName(rowClass);
+      var rowEmpties = [];
+      var rowValues = [];
+      for (var j = 0; j < 4; j++) {
+        if (rowDivs[j].textContent === "") {
+          rowEmpties.push("");
+        } else {
+          rowValues.push(rowDivs[j].textContent);
+        }
+      }
+      var newValues = rowValues.concat(rowEmpties);
+      this.shiftRowOrCol(rowDivs,newValues);
+    }
+  },
+  shiftRight: function () {
+    for (var i = 0; i < 4; i++) {
+      var rowClass = "r" + i;
+      var rowDivs = document.getElementsByClassName(rowClass);
+      var rowEmpties = [];
+      var rowValues = [];
+      for (var j = 3; j >= 0; j--) {
+        if (rowDivs[j].textContent === "") {
+          rowEmpties.push("");
+        } else {
+          rowValues.push(rowDivs[j].textContent);
+        }
+      }
+      var newValues = rowEmpties.concat(rowValues);
+      this.shiftRowOrCol(rowDivs,newValues);
+    }
+  },
+  shiftUp: function() {
 
+  },
+  shiftDown: function() {
+
+  },
+  shiftRowOrCol: function(rowDivs, rowValues) {
+    for (var i = 0; i < 4; i++) {
+      rowDivs[i].textContent = rowValues[i];
+    }
   }
 }
 
