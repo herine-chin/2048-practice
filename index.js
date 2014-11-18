@@ -36,16 +36,16 @@ Controller.prototype = {
   shiftTiles: function(direction) {
     switch(direction) {
       case "Left":
-      this.view.shiftLeft();
+      this.view.shiftLeftOrUp("r");
       break;
       case "Right":
-      this.view.shiftRight();
+      this.view.shiftRightOrDown("r");
       break;
       case "Up":
-      this.view.shiftUp();
+      this.view.shiftLeftOrUp("c");
       break;
       case "Down":
-      this.view.shiftDown();
+      this.view.shiftRightOrDown("c");
       break;
     }
   }
@@ -82,8 +82,6 @@ Model.prototype = {
 function View() {
   this.startButton = "start";
   this.tileClass = "tile";
-  this.rowIds = [[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]];
-  this.columnIds = [[1,5,9,13],[2,6,10,14],[3,7,11,15],[4,8,12,16]];
 }
 
 View.prototype = {
@@ -99,9 +97,10 @@ View.prototype = {
       tiles[i].textContent = "";
     }
   },
-  shiftLeft: function() {
+  shiftLeftOrUp: function(refLetter) {
+    var letter = refLetter;
     for (var i = 0; i < 4; i++) {
-      var rowClass = "r" + i;
+      var rowClass = refLetter + i;
       var rowDivs = document.getElementsByClassName(rowClass);
       var rowEmpties = [];
       var rowValues = [];
@@ -116,9 +115,10 @@ View.prototype = {
       this.shiftRowOrCol(rowDivs,newValues);
     }
   },
-  shiftRight: function () {
+  shiftRightOrDown: function(refLetter) {
+    var letter = refLetter;
     for (var i = 0; i < 4; i++) {
-      var rowClass = "r" + i;
+      var rowClass = refLetter + i;
       var rowDivs = document.getElementsByClassName(rowClass);
       var rowEmpties = [];
       var rowValues = [];
@@ -126,18 +126,12 @@ View.prototype = {
         if (rowDivs[j].textContent === "") {
           rowEmpties.push("");
         } else {
-          rowValues.push(rowDivs[j].textContent);
+          rowValues.unshift(rowDivs[j].textContent);
         }
       }
       var newValues = rowEmpties.concat(rowValues);
       this.shiftRowOrCol(rowDivs,newValues);
     }
-  },
-  shiftUp: function() {
-
-  },
-  shiftDown: function() {
-
   },
   shiftRowOrCol: function(rowDivs, rowValues) {
     for (var i = 0; i < 4; i++) {
