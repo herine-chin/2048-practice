@@ -33,19 +33,19 @@ Controller.prototype = {
       this.view.addTile(value, location);
     }
   },
-  shiftTiles: function(direction) {
-    switch(direction) {
+  shiftTiles: function( direction ) {
+    switch( direction ) {
       case "Left":
-      this.view.shiftLeftOrUp("r");
+      this.view.shiftRowOrColumn( "r", "northWest" );
       break;
       case "Right":
-      this.view.shiftRightOrDown("r");
+      this.view.shiftRowOrColumn( "r", "southEast" );
       break;
       case "Up":
-      this.view.shiftLeftOrUp("c");
+      this.view.shiftRowOrColumn( "c", "northWest" );
       break;
       case "Down":
-      this.view.shiftRightOrDown("c");
+      this.view.shiftRowOrColumn( "c", "southEast" );
       break;
     }
   }
@@ -97,47 +97,60 @@ View.prototype = {
       tiles[i].textContent = "";
     }
   },
-  shiftLeftOrUp: function(refLetter) {
-    var letter = refLetter;
+  shiftRowOrColumn: function(refLetter, direction) {
     for (var i = 0; i < 4; i++) {
-      var rowClass = refLetter + i;
-      var rowDivs = document.getElementsByClassName(rowClass);
-      var rowEmpties = [];
-      var rowValues = [];
-      for (var j = 0; j < 4; j++) {
-        if (rowDivs[j].textContent === "") {
-          rowEmpties.push("");
-        } else {
-          rowValues.push(rowDivs[j].textContent);
-        }
-      }
-      var newValues = rowValues.concat(rowEmpties);
-      this.shiftRowOrCol(rowDivs,newValues);
+      var divClass = refLetter + i;
+      var selectedDivs = document.getElementsByClassName(divClass);
+      var orderValues = this.orderValues(selectedDivs, direction);
+      var combinedValues = this.combineTiles(orderValues, direction);
+      this.displayNewRowOrCol(selectedDivs,combinedValues);
+
+      var newValues = this.orderValues(selectedDivs, direction);
+      this.displayNewRowOrCol(selectedDivs,newValues);
     }
   },
-  shiftRightOrDown: function(refLetter) {
-    var letter = refLetter;
+  displayNewRowOrCol: function(selectedDivs, divValues) {
     for (var i = 0; i < 4; i++) {
-      var rowClass = refLetter + i;
-      var rowDivs = document.getElementsByClassName(rowClass);
-      var rowEmpties = [];
-      var rowValues = [];
-      for (var j = 3; j >= 0; j--) {
-        if (rowDivs[j].textContent === "") {
-          rowEmpties.push("");
-        } else {
-          rowValues.unshift(rowDivs[j].textContent);
-        }
-      }
-      var newValues = rowEmpties.concat(rowValues);
-      this.shiftRowOrCol(rowDivs,newValues);
+      selectedDivs[i].textContent = divValues[i];
     }
   },
-  shiftRowOrCol: function(rowDivs, rowValues) {
+  orderValues: function(selectedDivs, direction) {
+    var divEmpties = [];
+    var divValues = [];
     for (var i = 0; i < 4; i++) {
-      rowDivs[i].textContent = rowValues[i];
+      if ( selectedDivs[i].textContent !== "" ) {
+        divValues.push(selectedDivs[i].textContent);
+      } else {
+        divEmpties.push("");
+      }
     }
+
+    if (direction === "northWest") {
+      return divValues.concat(divEmpties);
+    } else if (direction === "southEast") {
+      return divEmpties.concat(divValues);
+    }
+
+  },
+  combineTiles: function(values, direction) {
+    if (direction === "northWest") {
+      for (var i = 0; i < 4; i++) {
+        if (values[i] === values[i+1] && values[i] !== "" ) {
+          values[i] = 2*values[i];
+          values[i+1] = "";
+        }
+      }
+    } else if (direction === "southEast") {
+      for (var i = 3; i >= 0; i--) {
+        if (values[i] === values[i-1] && values[i] !== "" ) {
+          values[i] = 2*values[i];
+          values[i-1] = "";
+        }
+      }
+    }
+    return values;
   }
+
 }
 
 window.onload = function() {
