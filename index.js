@@ -26,10 +26,8 @@ Controller.prototype = {
   moveBoard: function(key) {
     if (key.keyIdentifier === "Up" || key.keyIdentifier === "Down" || key.keyIdentifier === "Left" || key.keyIdentifier === "Right" ) {
       this.shiftTiles(key.keyIdentifier);
-
-      this.checkBoard();
-
       this.model.updateTileLocations();
+      this.checkBoard();
       var value = this.model.getTileValue();
       var location = this.model.getTileLocation();
       this.view.addTile(value, location);
@@ -52,11 +50,15 @@ Controller.prototype = {
     }
   },
   checkBoard: function() {
-    var tiles = document.getElementsByClassName(this.model.tileClass);
+    var tiles = document.getElementsByClassName(this.view.tileClass);
     for (var i = 0; i < 16; i ++) {
       if (tiles[i].textContent === "2048") {
-        this.view.alertWinner();
+        this.view.alertPlayer( "You win!" );
       }
+    }
+
+    if (this.model.tileLocations.length === 0) {
+      this.view.alertPlayer( "You lose!" );
     }
   }
 }
@@ -65,7 +67,6 @@ Controller.prototype = {
 function Model() {
   this.tileValues = [2,4];
   this.tileLocations = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
-  this.tileClass = "tile";
 }
 
 Model.prototype = {
@@ -161,8 +162,8 @@ View.prototype = {
     }
     return values;
   },
-  alertWinner: function() {
-    alert("You win!");
+  alertPlayer: function(message) {
+    alert(message);
   }
 
 }
