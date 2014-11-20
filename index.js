@@ -15,6 +15,7 @@ Controller.prototype = {
   },
   startNewGame: function() {
     this.view.resetBoard();
+    this.model.resetScore();
     this.model.updateTileLocations(this.view.tileClass);
     this.view.addTile(this.model.getTileValue(), this.model.getTileLocation());
     this.model.updateTileLocations(this.view.tileClass);
@@ -27,6 +28,7 @@ Controller.prototype = {
     if (key.keyIdentifier === "Up" || key.keyIdentifier === "Down" || key.keyIdentifier === "Left" || key.keyIdentifier === "Right" ) {
       var previousBoard = this.saveBoard();
       this.shiftTiles(key.keyIdentifier);
+      this.view.displayScore();
       var currentBoard = this.saveBoard();
 
       if (currentBoard.toString() !== previousBoard.toString()) {
@@ -97,11 +99,16 @@ Model.prototype = {
         this.tileLocations.push(tiles[i].id);
       }
     }
+  },
+  resetScore: function() {
+    this.score = 0;
   }
 }
 
 // View
 function View() {
+  this.score = 0;
+  this.scoreId = "score";
   this.startButton = "start";
   this.tileClass = "tile";
 }
@@ -160,6 +167,7 @@ View.prototype = {
         if (values[i] === values[i+1] && values[i] !== "" ) {
           values[i] = 2*values[i];
           values[i+1] = "";
+          this.updateScore(values[i]);
         }
       }
     } else if (direction === "southEast") {
@@ -167,6 +175,7 @@ View.prototype = {
         if (values[i] === values[i-1] && values[i] !== "" ) {
           values[i] = 2*values[i];
           values[i-1] = "";
+          this.updateScore(values[i]);
         }
       }
     }
@@ -174,6 +183,14 @@ View.prototype = {
   },
   alertPlayer: function(message) {
     alert(message);
+  },
+  displayScore: function() {
+    var scoreDiv = document.getElementById(this.scoreId);
+    scoreDiv.textContent = this.score;
+  },
+  updateScore: function(score) {
+    this.score += parseInt(score,10);
+    console.log(this.score);
   }
 
 }
