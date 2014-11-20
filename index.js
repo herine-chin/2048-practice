@@ -16,9 +16,9 @@ Controller.prototype = {
   startNewGame: function() {
     this.view.resetBoard();
     this.model.updateTileLocations();
-    var value = this.model.getTileValue();
-    var location = this.model.getTileLocation();
-    this.view.addTile(value, location);
+    this.view.addTile(this.model.getTileValue(), this.model.getTileLocation());
+    this.model.updateTileLocations();
+    this.view.addTile(this.model.getTileValue(), this.model.getTileLocation());
   },
   addKeyListener: function() {
     document.addEventListener("keyup", this.moveBoard.bind(this));
@@ -28,9 +28,7 @@ Controller.prototype = {
       this.shiftTiles(key.keyIdentifier);
       this.model.updateTileLocations();
       this.checkBoard();
-      var value = this.model.getTileValue();
-      var location = this.model.getTileLocation();
-      this.view.addTile(value, location);
+      this.view.addTile(this.model.getTileValue(), this.model.getTileLocation());
     }
   },
   shiftTiles: function( direction ) {
@@ -173,4 +171,5 @@ window.onload = function() {
   var model = new Model();
   var controller = new Controller(view, model);
   controller.addListeners();
+  controller.startNewGame();
 }
