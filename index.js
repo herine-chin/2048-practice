@@ -15,9 +15,9 @@ Controller.prototype = {
   },
   startNewGame: function() {
     this.view.resetBoard();
-    this.model.updateTileLocations();
+    this.model.updateTileLocations(this.view.tileClass);
     this.view.addTile(this.model.getTileValue(), this.model.getTileLocation());
-    this.model.updateTileLocations();
+    this.model.updateTileLocations(this.view.tileClass);
     this.view.addTile(this.model.getTileValue(), this.model.getTileLocation());
   },
   addKeyListener: function() {
@@ -25,10 +25,15 @@ Controller.prototype = {
   },
   moveBoard: function(key) {
     if (key.keyIdentifier === "Up" || key.keyIdentifier === "Down" || key.keyIdentifier === "Left" || key.keyIdentifier === "Right" ) {
+      var previousBoard = this.saveBoard();
       this.shiftTiles(key.keyIdentifier);
-      this.model.updateTileLocations();
-      this.checkBoard();
-      this.view.addTile(this.model.getTileValue(), this.model.getTileLocation());
+      var currentBoard = this.saveBoard();
+
+      if (currentBoard.toString() !== previousBoard.toString()) {
+        this.model.updateTileLocations(this.view.tileClass);
+        this.checkBoard();
+        this.view.addTile(this.model.getTileValue(), this.model.getTileLocation());
+      }
     }
   },
   shiftTiles: function( direction ) {
@@ -58,6 +63,14 @@ Controller.prototype = {
     if (this.model.tileLocations.length === 0) {
       this.view.alertPlayer( "You lose!" );
     }
+  },
+  saveBoard: function() {
+    var tiles = document.getElementsByClassName(this.view.tileClass);
+    var board = [];
+    for (var i =0; i<16; i++) {
+      board.push(tiles[i].textContent);
+    }
+    return board;
   }
 }
 
@@ -76,10 +89,9 @@ Model.prototype = {
     var tileLocations = this.tileLocations;
     return tileLocations.splice(Math.floor(Math.random()*tileLocations.length),1)
   },
-  updateTileLocations: function() {
-    this.tileLocations = []
-    //way to dry this up? repeated in View
-    var tiles = document.getElementsByClassName("tile");
+  updateTileLocations: function(tileClass) {
+    this.tileLocations = [];
+    var tiles = document.getElementsByClassName(tileClass);
     for (var i = 0; i < tiles.length; i++ ) {
       if (tiles[i].textContent === "") {
         this.tileLocations.push(tiles[i].id);
