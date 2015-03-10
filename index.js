@@ -15,7 +15,7 @@ Controller.prototype = {
   },
   startNewGame: function() {
     this.view.resetBoard();
-    this.model.resetScore();
+    this.view.resetScore();
     this.model.updateTileLocations(this.view.tileClass);
     this.view.addTile(this.model.getTileValue(), this.model.getTileLocation());
     this.model.updateTileLocations(this.view.tileClass);
@@ -128,9 +128,6 @@ Model.prototype = {
         this.tileLocations.push(tiles[i].id);
       }
     }
-  },
-  resetScore: function() {
-    this.score = 0;
   }
 }
 
@@ -219,8 +216,11 @@ View.prototype = {
   },
   updateScore: function(score) {
     this.score += parseInt(score,10);
+  },
+  resetScore: function() {
+    this.score = 0;
+    this.displayScore();
   }
-
 }
 
 window.onload = function() {
