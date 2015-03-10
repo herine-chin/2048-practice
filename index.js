@@ -30,10 +30,10 @@ Controller.prototype = {
       this.shiftTiles(key.keyIdentifier);
       this.view.displayScore();
       var currentBoard = this.saveBoard();
+      this.model.updateTileLocations(this.view.tileClass);
+      this.winCheck();
 
       if (currentBoard.toString() !== previousBoard.toString()) {
-        this.model.updateTileLocations(this.view.tileClass);
-        this.checkBoard();
         this.view.addTile(this.model.getTileValue(), this.model.getTileLocation());
       }
     }
@@ -54,15 +54,15 @@ Controller.prototype = {
       break;
     }
   },
-  checkBoard: function() {
+  winCheck: function() {
     var tiles = document.getElementsByClassName(this.view.tileClass);
     for (var i = 0; i < 16; i ++) {
-      if (tiles[i].textContent === "2048") {
+      if (tiles[i].textContent === this.model.winTile) {
         this.view.alertPlayer( "You win!" );
       }
     }
 
-    if (this.model.tileLocations.length === 0) {
+    if ( !this.checkBoardMatches() && this.model.tileLocations.length === 0) {
       this.view.alertPlayer( "You lose!" );
     }
   },
@@ -73,11 +73,40 @@ Controller.prototype = {
       board.push(tiles[i].textContent);
     }
     return board;
+  },
+  checkBoardMatches: function() {
+    if ( this.checkForMatches( "c" ) || this.checkForMatches( "r" ) ) {
+      return true;
+    } else {
+      return false;
+    }
+  },
+  checkForMatches: function( refLetter ) {
+    for (var i = 0; i < 4; i++) {
+      var divClass = refLetter + i;
+      var selectedDivs = document.getElementsByClassName(divClass);
+      var orderValues = this.view.orderValues(selectedDivs, "northWest");
+      var tempValues = orderValues.slice(0);
+
+      for (var i = 0; i < 4; i++) {
+        if (tempValues[i] === tempValues[i+1] && tempValues[i] !== "" ) {
+          tempValues[i] = 2*tempValues[i];
+          tempValues[i+1] = "";
+        }
+      }
+
+      if ( orderValues.toString() !== tempValues.toString() ) {
+        return true;
+        break;
+      }
+    }
+    return false;
   }
 }
 
 // Model
 function Model() {
+  this.winTile = "2048";
   this.tileValues = [2,4];
   this.tileLocations = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
 }
@@ -190,7 +219,6 @@ View.prototype = {
   },
   updateScore: function(score) {
     this.score += parseInt(score,10);
-    console.log(this.score);
   }
 
 }
