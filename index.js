@@ -15,7 +15,7 @@ Controller.prototype = {
   },
   startNewGame: function() {
     this.view.resetBoard();
-    this.model.resetScore();
+    this.view.resetScore();
     this.model.updateTileLocations(this.view.tileClass);
     this.view.addTile(this.model.getTileValue(), this.model.getTileLocation());
     this.model.updateTileLocations(this.view.tileClass);
@@ -30,12 +30,13 @@ Controller.prototype = {
       this.shiftTiles(key.keyIdentifier);
       this.view.displayScore();
       var currentBoard = this.saveBoard();
+      this.model.updateTileLocations(this.view.tileClass);
 
       if (currentBoard.toString() !== previousBoard.toString()) {
-        this.model.updateTileLocations(this.view.tileClass);
-        this.checkBoard();
         this.view.addTile(this.model.getTileValue(), this.model.getTileLocation());
+        console.log("add a new tile");
       }
+      this.winCheck();
     }
   },
   shiftTiles: function( direction ) {
@@ -54,16 +55,17 @@ Controller.prototype = {
       break;
     }
   },
-  checkBoard: function() {
+  winCheck: function() {
     var tiles = document.getElementsByClassName(this.view.tileClass);
     for (var i = 0; i < 16; i ++) {
-      if (tiles[i].textContent === "2048") {
+      if (tiles[i].textContent === this.model.winTile) {
         this.view.alertPlayer( "You win!" );
       }
     }
 
-    if (this.model.tileLocations.length === 0) {
+    if ( this.model.tileLocations.length === 0 && !this.checkBoardMatches() ) {
       this.view.alertPlayer( "You lose!" );
+      console.log("You lose!");
     }
   },
   saveBoard: function() {
@@ -73,11 +75,38 @@ Controller.prototype = {
       board.push(tiles[i].textContent);
     }
     return board;
+  },
+  checkBoardMatches: function() {
+    if ( this.checkForMatches( "c" ) || this.checkForMatches( "r" ) ) {
+      return true;
+    } else {
+      return false;
+    }
+  },
+  checkForMatches: function( refLetter ) {
+    for (var i = 0; i < 4; i++) {
+      var divClass = refLetter + i;
+      var selectedDivs = document.getElementsByClassName(divClass);
+      var orderValues = this.view.orderValues(selectedDivs, "northWest");
+      var tempValues = orderValues.slice(0);
+
+      for (var j = 0; j < 4; j++) {
+        if (tempValues[j] === tempValues[j+1] && tempValues[j] !== "" ) {
+          tempValues[j] = 2*tempValues[j];
+          tempValues[j+1] = "";
+        }
+      }
+
+      if ( orderValues.toString() !== tempValues.toString() ) {
+        return true;
+      }
+    }
   }
 }
 
 // Model
 function Model() {
+  this.winTile = "2048";
   this.tileValues = [2,4];
   this.tileLocations = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
 }
@@ -99,9 +128,6 @@ Model.prototype = {
         this.tileLocations.push(tiles[i].id);
       }
     }
-  },
-  resetScore: function() {
-    this.score = 0;
   }
 }
 
@@ -190,9 +216,11 @@ View.prototype = {
   },
   updateScore: function(score) {
     this.score += parseInt(score,10);
-    console.log(this.score);
+  },
+  resetScore: function() {
+    this.score = 0;
+    this.displayScore();
   }
-
 }
 
 window.onload = function() {
