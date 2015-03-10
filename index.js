@@ -31,11 +31,12 @@ Controller.prototype = {
       this.view.displayScore();
       var currentBoard = this.saveBoard();
       this.model.updateTileLocations(this.view.tileClass);
-      this.winCheck();
 
       if (currentBoard.toString() !== previousBoard.toString()) {
         this.view.addTile(this.model.getTileValue(), this.model.getTileLocation());
+        console.log("add a new tile");
       }
+      this.winCheck();
     }
   },
   shiftTiles: function( direction ) {
@@ -62,8 +63,9 @@ Controller.prototype = {
       }
     }
 
-    if ( !this.checkBoardMatches() && this.model.tileLocations.length === 0) {
+    if ( this.model.tileLocations.length === 0 && !this.checkBoardMatches() ) {
       this.view.alertPlayer( "You lose!" );
+      console.log("You lose!");
     }
   },
   saveBoard: function() {
@@ -88,19 +90,17 @@ Controller.prototype = {
       var orderValues = this.view.orderValues(selectedDivs, "northWest");
       var tempValues = orderValues.slice(0);
 
-      for (var i = 0; i < 4; i++) {
-        if (tempValues[i] === tempValues[i+1] && tempValues[i] !== "" ) {
-          tempValues[i] = 2*tempValues[i];
-          tempValues[i+1] = "";
+      for (var j = 0; j < 4; j++) {
+        if (tempValues[j] === tempValues[j+1] && tempValues[j] !== "" ) {
+          tempValues[j] = 2*tempValues[j];
+          tempValues[j+1] = "";
         }
       }
 
       if ( orderValues.toString() !== tempValues.toString() ) {
         return true;
-        break;
       }
     }
-    return false;
   }
 }
 
